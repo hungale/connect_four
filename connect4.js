@@ -5,39 +5,62 @@
  * board fills (tie)
  */
 
-var WIDTH = 7;
-var HEIGHT = 6;
+const WIDTH = 7;
+const HEIGHT = 6;
 
-var currPlayer = 1; // active player: 1 or 2
-var board = []; // array of rows, each row is array of cells  (board[y][x])
+let currPlayer = 1; // active player: 1 or 2
+let board = []; // array of rows, each row is array of cells  (board[y][x])
 
 /** makeBoard: create in-JS board structure:
  *    board = array of rows, each row is array of cells  (board[y][x])
  */
 
 function makeBoard() {
-  // TODO: set "board" to empty HEIGHT x WIDTH matrix array
+  // set "board" to empty HEIGHT x WIDTH matrix array
+  board = Array(HEIGHT).fill(Array(WIDTH).fill(null)); 
 }
 
 /** makeHtmlBoard: make HTML table and row of column tops. */
 
 function makeHtmlBoard() {
-  // TODO: get "htmlBoard" variable from the item in HTML w/ID of "board"
+  // get "htmlBoard" variable from the item in HTML w/ID of "board"
+  let htmlBoard = document.getElementById('board');
 
-  // TODO: add comment for this code
-  var top = document.createElement("tr");
-  top.setAttribute("id", "column-top");
-  top.addEventListener("click", handleClick);
+  createTopRow(htmlBoard);
 
-  for (var x = 0; x < WIDTH; x++) {
-    var headCell = document.createElement("td");
+  createMatrix(htmlBoard);
+
+  // think that the code is getting unwieldly
+  // consider how we would refactor this into separate helpers
+  // e.g. createTopRow, createHeader
+  // personal preference on whether to refactor first
+  // ordering of functions?
+  // -> varies on teams
+  // -> organize logic, based on cascading relationships
+  // -> organize based on dependencies
+}
+
+
+/** createTopRow: create the top row and 
+ *                make it interactable with listeners. */
+function createTopRow(htmlBoard) {
+  // create the top row and add a listener for the top row of game
+  let topRow = document.createElement("tr");
+  topRow.setAttribute("id", "column-top");
+  topRow.addEventListener("click", handleClick);
+
+  for (let x = 0; x < WIDTH; x++) {
+    let headCell = document.createElement("td");
     headCell.setAttribute("id", x);
-    top.append(headCell);
+    topRow.append(headCell);
   }
-  htmlBoard.append(top);
+  htmlBoard.append(topRow);
+}
 
-  // TODO: add comment for this code
-  for (var y = 0; y < HEIGHT; y++) {
+/** createMatrix: create a width x height matrix. */
+function createMatrix(htmlBoard) {
+  // creates the 7x6 table in HTML, cell by cell
+  for (let y = 0; y < HEIGHT; y++) {
     const row = document.createElement("tr");
     for (var x = 0; x < WIDTH; x++) {
       const cell = document.createElement("td");
@@ -71,10 +94,10 @@ function endGame(msg) {
 
 function handleClick(evt) {
   // get x from ID of clicked cell
-  var x = +evt.target.id;
+  let x = +evt.target.id;
 
   // get next spot in column (if none, ignore click)
-  var y = findSpotForCol(x);
+  let y = findSpotForCol(x);
   if (y === null) {
     return;
   }
@@ -117,10 +140,10 @@ function checkForWin() {
 
   for (var y = 0; y < HEIGHT; y++) {
     for (var x = 0; x < WIDTH; x++) {
-      var horiz = [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]];
-      var vert = [[y, x], [y + 1, x], [y + 2, x], [y + 3, x]];
-      var diagDR = [[y, x], [y + 1, x + 1], [y + 2, x + 2], [y + 3, x + 3]];
-      var diagDL = [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]];
+      let horiz = [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]];
+      let vert = [[y, x], [y + 1, x], [y + 2, x], [y + 3, x]];
+      let diagDR = [[y, x], [y + 1, x + 1], [y + 2, x + 2], [y + 3, x + 3]];
+      let diagDL = [[y, x], [y + 1, x - 1], [y + 2, x - 2], [y + 3, x - 3]];
 
       if (_win(horiz) || _win(vert) || _win(diagDR) || _win(diagDL)) {
         return true;
@@ -132,3 +155,5 @@ function checkForWin() {
 // put inside a listen for DOMContentLoaded, or on a button
 makeBoard();
 makeHtmlBoard();
+
+// console.log('hi');
