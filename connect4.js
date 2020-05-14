@@ -59,7 +59,7 @@ function createTopRow(htmlBoard) {
 
 /** createMatrix: create a width x height matrix. */
 function createMatrix(htmlBoard) {
-  // creates the 7x6 table in HTML, cel~l by cell
+  // creates the 7x6 table in HTML, cell by cell
   for (let y = 0; y < HEIGHT; y++) {
     const row = document.createElement("tr");
     for (var x = 0; x < WIDTH; x++) {
@@ -75,13 +75,28 @@ function createMatrix(htmlBoard) {
 
 function findSpotForCol(x) {
   // TODO: write the real version of this, rather than always returning 0
-  return 0;
+  
+  for (let y = HEIGHT - 1; y >= 0; y--) {
+    let cell = document.getElementById(`${y}-${x}`);
+    if(!cell.hasChildNodes()) {
+      return y;
+    }
+  }
+  return null;
 }
 
 /** placeInTable: update DOM to place piece into HTML table of board */
 
 function placeInTable(y, x) {
   // TODO: make a div and insert into correct table cell
+  let piece = document.createElement("div");
+ 
+  piece.classList.add("piece", `p${currPlayer}`);
+  let currentCell = document.getElementById(`${y}-${x}`);
+  // should be set child node 
+  currentCell.appendChild(piece);
+  currentCell.innerHTML = "here";
+  console.log(currentCell);
 }
 
 /** endGame: announce game end */
@@ -113,9 +128,12 @@ function handleClick(evt) {
 
   // check for tie
   // TODO: check if all cells in board are filled; if so call, call endGame
-
+  if (board.every(cell => cell.hasChildNodes("piece"))) {
+    endGame()
+  }
   // switch players
   // TODO: switch currPlayer 1 <-> 2
+  currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
 }
 
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
