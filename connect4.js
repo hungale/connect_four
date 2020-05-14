@@ -59,7 +59,7 @@ function createTopRow(htmlBoard) {
 
 /** createMatrix: create a width x height matrix. */
 function createMatrix(htmlBoard) {
-  // creates the 7x6 table in HTML, cell by cell
+  // creates the 7x6 table in HTML, cel~l by cell
   for (let y = 0; y < HEIGHT; y++) {
     const row = document.createElement("tr");
     for (var x = 0; x < WIDTH; x++) {
