@@ -114,7 +114,6 @@ function placeInTable(y, x) {
   piece.style.animation = `${animationSpeed}s droppiece`;
 
   const currentCell = document.getElementById(`${y}-${x}`);
-  console.log('dead');
   currentCell.appendChild(piece);
 }
 
