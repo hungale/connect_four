@@ -70,10 +70,14 @@ function findSpotForCol(x) {
   // write the real version of this, rather than always returning 0
   
   for (let y = HEIGHT - 1; y >= 0; y--) {
-    let cell = document.getElementById(`${y}-${x}`);
-    if(!cell.hasChildNodes()) {
-      return y;
-    }
+    // can also use in-memory board, faster than DOM
+    if(!board[y][x]) return y;
+    
+    // DOM operations are expensive, but possible
+    // let cell = document.getElementById(`${y}-${x}`);
+    // if(!cell.hasChildNodes()) {
+    //   return y;
+    // }
   }
   return null;
 }
@@ -124,13 +128,17 @@ function handleClick(evt) {
 
   // switch players
   // switch currPlayer 1 <-> 2
-  currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
+  // currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
+  currPlayer = currPlayer === 1 ? 2 : 1;
 }
+
+//function checkForTie()
+//function switchPlayers()
 
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
 
 function checkForWin() {
-  function _win(cells) {
+  function _win(cells) { // starting with _ -> convention for private functions
     // Check four cells to see if they're all color of current player
     //  - cells: list of four (y, x) cells
     //  - returns true if all are legal coordinates & all match currPlayer
@@ -145,8 +153,10 @@ function checkForWin() {
     );
   }
 
-  // TODO: read and understand this code. Add comments to help you.
-
+  // read and understand this code. Add comments to help you.
+  // use a sliding (horizontal, vertical, diagonalx2) window of 4 tiles
+  // and private function _win to check to see 
+  // if all pieces in the tiles are owned by one player
   for (let y = 0; y < HEIGHT; y++) {
     for (let x = 0; x < WIDTH; x++) {
       const horiz = [[y, x], [y, x + 1], [y, x + 2], [y, x + 3]];
@@ -162,7 +172,8 @@ function checkForWin() {
 }
 
 // put inside a listen for DOMContentLoaded, or on a button
-makeBoard();
-makeHtmlBoard();
+document.addEventListener('DOMContentLoaded', () =>{
+  makeBoard();
+  makeHtmlBoard();
+});
 
-// console.log('hi');
