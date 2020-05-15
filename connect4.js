@@ -8,6 +8,11 @@
 const WIDTH = 7;
 const HEIGHT = 6;
 
+const TILE_OFFSET = 56; // each tile is 54x54 pixels, with a 2px offset
+// there's a 8px offset from the top to table 
+// and an additional 2px offset to top of cell and 2px to middle
+const TOP_OFFSET = 12;  
+
 let currPlayer = 1; // active player: 1 or 2
 let board = []; // array of rows, each row is array of cells  (board[y][x])
 
@@ -88,6 +93,12 @@ function placeInTable(y, x) {
   // make a div and insert into correct table cell
   let piece = document.createElement("div");
   piece.classList.add("piece", `p${currPlayer}`);
+  
+  let calcuatedOffset = TOP_OFFSET + ((TILE_OFFSET) * (y + 1));
+  piece.style.top = `${calcuatedOffset}px`;
+  let animationSpeed = 3 * ((y+1) / HEIGHT);
+  piece.style.animation = `${animationSpeed}s droppiece`;
+
   let currentCell = document.getElementById(`${y}-${x}`);
   currentCell.appendChild(piece);
 }
@@ -122,18 +133,23 @@ function handleClick(evt) {
 
   // check for tie
   // check if all cells in board are filled; if so call, call endGame
+  checkForTie() 
+
+  // switch players
+  switchPlayers();
+}
+
+function checkForTie() {
   if(board.every(column => column.every(cell => cell))) {
     endGame('Tie!');
   }
+}
 
-  // switch players
+function switchPlayers() {
   // switch currPlayer 1 <-> 2
   // currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
   currPlayer = currPlayer === 1 ? 2 : 1;
 }
-
-//function checkForTie()
-//function switchPlayers()
 
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
 
