@@ -9,22 +9,17 @@
 /* pieces are div within game table cells: draw as colored circles */
 
 .piece {
-  /* TODO: make into circles */
+  /* changes shape to a circle */
   border-radius: 50%;
-  /* margin: 5px; */
-  /* width: 80%; */
-  /* height: 80%; */
 
   position: absolute;
+  margin: 5px;
   width: 40px;
   height: 40px;
-  margin: 5px;
-  /* animation: 3s droppiece; */
+  
 }
-/* [12, 67, 123] 56.285714285714285 or 394/7 is offset*/
 @keyframes droppiece {
   from { top: 0%; }
-  /* to   { top: 57%; } */
 }
 
 /* TODO: make pieces red/blue,  depending on player 1/2 piece */

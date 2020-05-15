@@ -8,10 +8,30 @@
 const WIDTH = 7;
 const HEIGHT = 6;
 
-const TILE_OFFSET = 56; // each tile is 54x54 pixels, with a 2px offset
-// there's a 8px offset from the top to table 
-// and an additional 2px offset to top of cell and 2px to middle
-const TOP_OFFSET = 12;  
+/* calculates the offsets needed to put the pieces in the middle of the tiles
+in our ex: 
+each tile is 54x54 pixels, with a 2px offset from table's border-spacing
+const TILE_OFFSET = 56; 
+there's a 8px offset from the top of page to table 
+and an additional 2px offset to top of cell from table's border-spacing
+and 2px to middle of cell b/c of border+padding, MAGIC NUMBERS 
+const TOP_OFFSET = 12;  */
+function calculateOffset(){
+  const tableCell = document.getElementById('0');
+ 
+  const htmlBoard = document.getElementById('board');
+  // a table's border spacing will be a string w/ pixel value or 2px by default 
+  const borderSpacing = parseFloat(htmlBoard.style.borderSpacing) || 2;
+  const topOffset = htmlBoard.offsetTop + borderSpacing + tableCell.offsetTop;
+
+  // an offset is the combined size of border+padding+margin
+  // for a table's cells/tiles, it's that + the table's border-spacing
+  const tileOffset = tableCell.offsetHeight + borderSpacing;
+  
+
+  return {topOffset, tileOffset};
+}
+
 
 let currPlayer = 1; // active player: 1 or 2
 let board = []; // array of rows, each row is array of cells  (board[y][x])
@@ -22,16 +42,14 @@ let board = []; // array of rows, each row is array of cells  (board[y][x])
 
 function makeBoard() {
   // set "board" to empty HEIGHT x WIDTH matrix array
-  // board = Array(HEIGHT).fill(Array(WIDTH).fill(null)); 
-  // runs into error where all columns of a row are called
-  board = Array.from({length:HEIGHT}, () => Array(WIDTH).fill(null))
+  board = Array.from({length:HEIGHT}, () => Array(WIDTH).fill(null));
 }
 
 /** makeHtmlBoard: make HTML table and row of column tops. */
 
 function makeHtmlBoard() {
   // get "htmlBoard" variable from the item in HTML w/ID of "board"
-  let htmlBoard = document.getElementById('board');
+  const htmlBoard = document.getElementById('board');
 
   createTopRow(htmlBoard);
 
@@ -43,12 +61,12 @@ function makeHtmlBoard() {
  *                make it interactable with listeners. */
 function createTopRow(htmlBoard) {
   // create the top row and add a listener for the top row of game
-  let topRow = document.createElement("tr");
+  const topRow = document.createElement("tr");
   topRow.setAttribute("id", "column-top");
   topRow.addEventListener("click", handleClick);
 
   for (let x = 0; x < WIDTH; x++) {
-    let headCell = document.createElement("td");
+    const headCell = document.createElement("td");
     headCell.setAttribute("id", x);
     topRow.append(headCell);
   }
@@ -75,14 +93,8 @@ function findSpotForCol(x) {
   // write the real version of this, rather than always returning 0
   
   for (let y = HEIGHT - 1; y >= 0; y--) {
-    // can also use in-memory board, faster than DOM
+    // accessing DOM is expensive, using in-memory board is preferable
     if(!board[y][x]) return y;
-    
-    // DOM operations are expensive, but possible
-    // let cell = document.getElementById(`${y}-${x}`);
-    // if(!cell.hasChildNodes()) {
-    //   return y;
-    // }
   }
   return null;
 }
@@ -91,17 +103,22 @@ function findSpotForCol(x) {
 
 function placeInTable(y, x) {
   // make a div and insert into correct table cell
-  let piece = document.createElement("div");
+  const piece = document.createElement("div");
   piece.classList.add("piece", `p${currPlayer}`);
   
-  let calcuatedOffset = TOP_OFFSET + ((TILE_OFFSET) * (y + 1));
+  // set up animation for piece, maybe put into own
+  const {topOffset, tileOffset} = calculateOffset();
+  const calcuatedOffset = topOffset + ((tileOffset) * (y + 1));
   piece.style.top = `${calcuatedOffset}px`;
-  let animationSpeed = 3 * ((y+1) / HEIGHT);
+  const animationSpeed = 3 * ((y+1) / HEIGHT);
   piece.style.animation = `${animationSpeed}s droppiece`;
 
-  let currentCell = document.getElementById(`${y}-${x}`);
+  const currentCell = document.getElementById(`${y}-${x}`);
+  console.log('dead');
   currentCell.appendChild(piece);
 }
+
+// can add function stylePiece(piece)
 
 /** endGame: announce game end */
 
@@ -114,10 +131,10 @@ function endGame(msg) {
 
 function handleClick(evt) {
   // get x from ID of clicked cell
-  let x = +evt.target.id;
+  const x = +evt.target.id;
 
   // get next spot in column (if none, ignore click)
-  let y = findSpotForCol(x);
+  const y = findSpotForCol(x);
   if (y === null) {
     return;
   }
@@ -132,14 +149,14 @@ function handleClick(evt) {
   }
 
   // check for tie
-  // check if all cells in board are filled; if so call, call endGame
-  checkForTie() 
+  checkForTie();
 
   // switch players
   switchPlayers();
 }
 
 function checkForTie() {
+  // check if all cells in board are filled; if so call, call endGame
   if(board.every(column => column.every(cell => cell))) {
     endGame('Tie!');
   }
@@ -147,7 +164,6 @@ function checkForTie() {
 
 function switchPlayers() {
   // switch currPlayer 1 <-> 2
-  // currPlayer === 1 ? currPlayer = 2 : currPlayer = 1;
   currPlayer = currPlayer === 1 ? 2 : 1;
 }
 
@@ -188,7 +204,7 @@ function checkForWin() {
 }
 
 // put inside a listen for DOMContentLoaded, or on a button
-document.addEventListener('DOMContentLoaded', () =>{
+document.addEventListener('DOMContentLoaded', () => {
   makeBoard();
   makeHtmlBoard();
 });
